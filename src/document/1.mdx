@@ -1,0 +1,101 @@
+# 1.
+
+In this section, we will first evaluate a market share (MS) model and then create the base (BS) model with the following variables.
+
+| Variable       | Stands for            |
+| -------------- | --------------------- |
+| (asc_el/train) | (Constants)           |
+| lhfs1          | General Service       |
+| lhfs3          | Lack of Travel Stress |
+| minttime       | Travel Time           |
+
+Consequently, using `apoll$o` package in R, we have obtained the foll\$owing MS model.
+
+**Table 2. MS Model (N=174)**
+
+| Variable                | Estimate                    | Std. Error      | t-Sta.               |
+| ----------------------- | --------------------------- | --------------- | -------------------- |
+| asc_el                  | 0                           | 0.164           | 1.182e-7             |
+| asc_train               | -1.046                      | 0.228           | -4.588 \*\*          |
+| asc_auto                | (base)                      | -               | -                    |
+| $\mathcal{L}$: -175.964 | $\mathcal{L}(EL)$: -191.159 | $\rho^2$: 0.080 | Adj. $\rho^2$: 0.069 |
+
+This result indicates that the market share of the rapid transit system and automobile are equal. Indeed, there are respectively in total 74 participants who choose either rapid transit or automobile. Compared to those modes, the train has much smaller market share. The ratio between the probability of choosing rapid transit and train indicates
+
+$$
+\frac{p(\text{train})}{p(\text{el})} = \frac{\exp(-1.046)}{\exp(0)} = \frac{0.351}{1} = 35.1%
+$$
+
+This number matches to the actual data where $26 = 74 \times 0.351$ participants choose the train mode.
+
+The MS model is the most primitive model with only two constants, and we can test if this model has a better performance than equal likely (EL) model, which always estimates the probability of choosing each mode as 1/3. With the statistic
+
+$$
+\mathcal{L} = -2(-191.159 +175.964) = 30.39 \sim \chi^2(\text{d.f. = 2}) \text{ under } H_0
+$$
+
+where the hypotheses are
+
+$$
+\begin{cases}
+  H_0: \text{The performance of MS model is not significantly better than that of EL model} \\
+  H_1: \text{Otherwise}
+\end{cases}
+$$
+
+(Note: the alternative hypothesis always states "otherwise", so we will not explicitly denote it in the rest of this document.)
+
+The p-value for this test can be evaluated by
+
+$$
+1 - \int_{-\infty}^{30.39} \chi^2(x,2) dx = 2.517 \times 10^{-7}
+$$
+
+Given this, we can say that the MS model makes a better estimation than EL model do, although the overall performance is still quite far from the "perfect" model as the $\rho^2 = 0.080$ and adjusted $\rho^2 = 0.069$ shows.
+
+Next, the following tables displays the summary of our BS model and MS model with the same dataset for BS model.
+
+**Table 3. BS Model (N=114)**
+
+| Variable               | Estimate                    | Std. Error      | t-Sta.               |
+| ---------------------- | --------------------------- | --------------- | -------------------- |
+| asc_el                 | 0.450                       | 0.439           | 1.026                |
+| asc_train              | -0.795                      | 0.666           | -1.194               |
+| asc_auto               | (base)                      | -               | -                    |
+| General Service        | 1.070                       | 0.310           | 3.450 \*\*           |
+| Lack of Travel Stress  | 1.105                       | 0.285           | 3.878 \*\*           |
+| Travel Time            | -0.051                      | 0.018           | -2.930 \*\*          |
+| $\mathcal{L}$: -62.048 | $\mathcal{L}(EL)$: -125.242 | $\rho^2$: 0.505 | Adj. $\rho^2$: 0.465 |
+
+**Table 4. MS Model with Dataset for BS Model (N=114)**
+
+| Variable                | Estimate                    | Std. Error      | t-Sta.               |
+| ----------------------- | --------------------------- | --------------- | -------------------- |
+| asc_el                  | 0.0852                      | 0.207           | 0.412                |
+| asc_train               | -0.811                      | 0.269           | -3.018 \*\*          |
+| asc_auto                | (base)                      | -               | -                    |
+| $\mathcal{L}$: -118.013 | $\mathcal{L}(EL)$: -125.242 | $\rho^2$: 0.058 | Adj. $\rho^2$: 0.042 |
+
+We can see that the performance of the BS model has clearly improved from the MS model, with the difference of $$\rho^2$$ by $0.505 - 0.058 = 0.447$ and adjusted $$\rho^2$$ by $0.465 - 0.042 = 0.423$. Also, we can perform likelihood-ratio test with the statistic
+
+$$
+\mathcal{L} = -2(-118.013 + 62.048) = 111.930 \sim \chi^2(\text{d.f. = 3}) \text{ under } H_0
+$$
+
+where the null hypothesis is
+
+$$
+H_0: \text{The performance of BS model is not significantly better than that of MS model}
+$$
+
+The p-value for this test can be evaluated by
+
+$$
+1 - \int_{-\infty}^{111.930} \chi^2(x,3) dx = 4.216 \times 10^{-24}
+$$
+
+Therefore, we can conclude that the BS model certainly has a better performance than MS model for this dataset.
+
+<img src={require('../data/image1.png')} width={'75%'} />
+
+**Figure 1. Performance comparison between El, MS, BS and the perfect model.**

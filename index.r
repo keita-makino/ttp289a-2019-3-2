@@ -10,13 +10,46 @@ database = read.csv("data.csv")
 apollo_initialise()
 
 source("./market.R")
-market(database)
+m = market(database)
 
 source("./base.R")
-base(database %>% .[complete.cases(.), ])
-market(database %>% .[complete.cases(.), ])
+ba = base(database %>% .[complete.cases(.),], "auto")
+bt = base(database %>% .[complete.cases(.),], "train")
+bm = market(database %>% .[complete.cases(.),])
 
 source("./reduced.R")
-reduced(database %>% .[.$choice != 2, ] %>% .[complete.cases(.), ], "el", "auto")
-reduced(database %>% .[.$choice != 4, ] %>% .[complete.cases(.), ], "train", "auto")
-reduced(database %>% .[.$choice != 7, ] %>% .[complete.cases(.), ], "auto", "train")
+assign("reducedVariable", c("train", "auto"))
+re = reduced(database %>% .[.$choice != 2,] %>% .[complete.cases(.),], reducedVariable, "auto")
+
+assign("reducedVariable", c("el", "auto"))
+rt = reduced(database %>% .[.$choice != 4,] %>% .[complete.cases(.),], reducedVariable, "auto")
+
+assign("reducedVariable", c("el", "train"))
+ra = reduced(database %>% .[.$choice != 7,] %>% .[complete.cases(.),], reducedVariable, "train")
+
+getP = function(r, u) {
+  name = names(u$estimate) %in% names(r$estimate)
+  rb = r$estimate %>% .[. != 0]
+  ub = u$estimate[name] %>% .[. != 0]
+  name = colnames(u$varcov) %in% colnames(r$varcov)
+  rv = r$varcov
+  uv = u$varcov[name,name]
+  chi = (rb - ub) %*% solve(rv - uv) %*% (rb - ub)
+  p <- pchisq(chi,df=sum(name),lower.tail=FALSE)
+  return(c(chi = chi,p = p, df = sum(name)))
+}
+
+getP(re, ba)
+getP(rt, ba)
+getP(ra, bt)
+
+source("./nested.R")
+assign("groupVariable", c("train", "auto"))
+ne = nested(database %>% .[complete.cases(.),], groupVariable, "auto")
+
+assign("groupVariable", c("el", "auto"))
+nt = nested(database %>% .[complete.cases(.),], groupVariable, "auto")
+
+assign("groupVariable", c("el", "train"))
+na = nested(database %>% .[complete.cases(.),], groupVariable, "auto")
+
