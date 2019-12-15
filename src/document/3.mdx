@@ -1,0 +1,69 @@
+# 3.
+
+In the end, in this section we will develop several partially-segmented models and determine the best one among them. As discussed in the previous chapter, now the dataset has female-only variables and male-only columns as whose structure has been shown in table 3.2. Using this dataset, partially-segmented model uses a combination of all-gender variables and gender-specific variables.
+
+The first partially-segmented (PS1) model we introduce has the following structure.
+
+**Table 6.1. Structure of PS1 Model**
+
+| Variable                | Type            |
+| ----------------------- | --------------- |
+| (Constant)              | Gender-Specific |
+| Two-way commute time    | All-Gender      |
+| Commute stress          | All-Gender      |
+| Lack of manager support | All-Gender      |
+| Job unsuitability       | Gender-Specific |
+| Age (binary grouping)   | Gender-Specific |
+| Office Discipline       | All-Gender      |
+
+In this model, the variables which are identified as a gender-specific variable in FS **and** MS model with more than **95%** confidence level are treated as a gender-specific variable.
+
+**Table 6.2. Structure of PS2 Model**
+
+| Variable                | Type            |
+| ----------------------- | --------------- |
+| (Constant)              | Gender-Specific |
+| Two-way commute time    | All-Gender      |
+| Commute stress          | Gender-Specific |
+| Lack of manager support | Gender-Specific |
+| Job unsuitability       | Gender-Specific |
+| Age (binary grouping)   | Gender-Specific |
+| Office Discipline       | All-Gender      |
+
+On the other hand, the second partially-segmented (PS2) model contains more gender-specific variables. If a variable has been determined as gender-specific in FS **or** MS model with **90%** confidence level, we include it as a gender-specific variable in the PS2 model.
+
+Consequently, we obtained the following results from these models.
+
+**Table 7.1. FS Model (N=333)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (F)              | 2.585                       | 0.493                  | 5.245                       |
+| (Constant) (M)              | 1.204                       | 0.465                  | 2.589                       |
+| Two-way commute time (P)    | -0.007                      | 0.004                  | -1.762                      |
+| Commute stress (P)          | 0.767                       | 0.260                  | 2.950                       |
+| Lack of manager support (P) | -2.872                      | 0.408                  | -7.042                      |
+| Job unsuitability (F)       | -2.284                      | 0.556                  | -4.107                      |
+| Job unsuitability (M)       | -0.750                      | 0.431                  | -1.742                      |
+| Age (binary grouping) (F)   | -1.505                      | 0.500                  | -3.011                      |
+| Age (binary grouping) (M)   | -0.229                      | 0.415                  | -0.551                      |
+| Office Discipline (P)       | -0.753                      | 0.197                  | -3.825                      |
+| $\mathcal{L}$: -135.270     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.414 | Adj. $\rho^2_{(EL)}$: 0.371 |
+
+**Table 7.2. FS Model (N=333)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (F)              | 2.888                       | 0.578                  | 4.995                       |
+| (Constant) (M)              | 1.117                       | 0.459                  | 2.435                       |
+| Two-way commute time (P)    | -0.007                      | 0.004                  | -1.701                      |
+| Commute stress (F)          | 1.405                       | 0.500                  | 2.808                       |
+| Commute stress (M)          | 0.514                       | 0.294                  | 1.747                       |
+| Lack of manager support (F) | -4.166                      | 0.739                  | -5.638                      |
+| Lack of manager support (M) | -2.078                      | 0.484                  | -4.290                      |
+| Job unsuitability (F)       | -2.330                      | 0.633                  | -3.685                      |
+| Job unsuitability (M)       | -0.874                      | 0.416                  | -2.102                      |
+| Age (binary grouping) (F)   | -1.720                      | 0.576                  | -2.987                      |
+| Age (binary grouping) (M)   | -0.265                      | 0.397                  | -0.668                      |
+| Office Discipline (P)       | -0.773                      | 0.201                  | -3.850                      |
+| $\mathcal{L}$: -131.431     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.431 | Adj. $\rho^2_{(EL)}$: 0.379 |

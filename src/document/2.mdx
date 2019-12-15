@@ -1,49 +1,185 @@
 # 2.
 
-Once we identify the base models, first we use each model to estimate the population of **opposite** gender or the **entire** population. It means, we use the BF model to estimate whether male workers would telecommute or not, and whether all the workers would telecommute or not. The following tables displays the details of the BF model when the sample has been changed.
+In this section, we will explore several segmentation method that may improve the "best" model introduced in the previous section. In this assignment, we pick the gender as the target of the segmentation.
 
-**Table 3.1. BF Model (Male Dataset) (N=167)**
+First of all, we need a data conversion to make a segmented model. Assuming that the original dataset has the following structure:
 
-| Variable                          | Estimate                    | Std. Error      | t-Sta.               |
-| --------------------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)                        | 0.866                       | 0.484           | 1.790 \*\*           |
-| Children less than 6 years of age | -0.692                      | 0.446           | -1.553 \*            |
-| Two-way commute time              | -0.003                      | 0.005           | -0.570               |
-| Commute stress                    | 0.618                       | 0.288           | 2.148 \*\*           |
-| Lack of manager support           | -1.927                      | 0.472           | -4.082 \*\*          |
-| Job unsuitability                 | -0.880                      | 0.406           | -2.166 \*\*          |
-| Age (binary grouping)             | -0.141                      | 0.386           | -0.365               |
-| $\mathcal{L}$: -90.088            | $\mathcal{L}(EL)$: -115.756 | $\rho^2$: 0.222 | Adj. $\rho^2$: 0.161 |
+**Table 3.1. Structure of Original Dataset**
 
-**Table 3.2. BF Model (Entire Dataset) (N=333)**
+| id  | Telecommuting (T) | Female (F) | Commute Time (CT) | Office Discipline (OD) | Job Constraint (JC) | ... |
+| --- | ----------------- | ---------- | ----------------- | ---------------------- | ------------------- | --- |
+| 1   | 1                 | 1          | 25                | -0.82                  | 1                   | ... |
+| 2   | 0                 | 0          | 30                | 2.46                   | 1                   | ... |
+| 3   | 1                 | 0          | 25                | 0.31                   | 1                   | ... |
+| 4   | 1                 | 1          | 30                | 2.53                   | 0                   | ... |
+| 5   | 0                 | 1          | 50                | 0.49                   | 0                   | ... |
+| 6   | 1                 | 0          | 40                | 1.72                   | 1                   | ... |
+| 7   | 0                 | 0          | 40                | -2.20                  | 1                   | ... |
+| 8   | 1                 | 0          | 45                | -0.37                  | 0                   | ... |
 
-| Variable                          | Estimate                    | Std. Error      | t-Sta.               |
-| --------------------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)                        | 2.010                       | 0.391           | 5.146 \*\*           |
-| Children less than 6 years of age | -0.629                      | 0.372           | -1.690 \*\*          |
-| Two-way commute time              | -0.008                      | 0.004           | -0.976               |
-| Commute stress                    | 1.008                       | 0.249           | 4.042 \*\*           |
-| Lack of manager support           | -2.702                      | 0.383           | -7.059 \*\*          |
-| Job unsuitability                 | -1.491                      | 0.326           | -4.578 \*\*          |
-| Age (binary grouping)             | -0.718                      | 0.316           | -2.270 \*\*          |
-| $\mathcal{L}$: -147.570           | $\mathcal{L}(EL)$: -230.818 | $\rho^2$: 0.361 | Adj. $\rho^2$: 0.330 |
+then we convert the table to the following structure:
 
-**Table 4.1. BM Model (Female Dataset) (N=167)**
+**Table 3.2. Structure of Converted Dataset**
 
-| Variable                | Estimate                    | Std. Error      | t-Sta.               |
-| ----------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)              | 1.242                       | 0.431           | 2.880 \*\*           |
-| Two-way commute time    | -0.004                      | 0.006           | -0.693               |
-| Lack of manager support | -3.787                      | 0.574           | -6.594 \*\*          |
-| Office Discipline       | -0.575                      | 0.257           | -2.240 \*\*          |
-| $\mathcal{L}$: -70.141  | $\mathcal{L}(EL)$: -115.756 | $\rho^2$: 0.394 | Adj. $\rho^2$: 0.360 |
+| id  | T   | F   | M   | CT(P) | CT(F) | CT(M) | OD(P) | OD(F) | OD(M) | JC(P) | JC(F) | JC(M) | ... |
+| --- | --- | --- | --- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | --- |
+| 1   | 1   | 1   | 0   | 25    | 25    | 0     | -0.82 | -0.82 | 0     | 1     | 1     | 0     | ... |
+| 2   | 0   | 0   | 1   | 30    | 0     | 30    | 2.46  | 0     | 2.46  | 1     | 0     | 1     | ... |
+| 3   | 1   | 0   | 1   | 25    | 0     | 25    | 0.31  | 0     | 0.31  | 1     | 0     | 1     | ... |
+| 4   | 1   | 1   | 0   | 30    | 30    | 0     | 2.53  | 2.53  | 0     | 0     | 0     | 0     | ... |
+| 5   | 0   | 1   | 0   | 50    | 50    | 0     | 0.49  | 0.49  | 0     | 0     | 0     | 0     | ... |
+| 6   | 1   | 0   | 1   | 40    | 0     | 40    | 1.72  | 0     | 1.72  | 1     | 0     | 1     | ... |
+| 7   | 0   | 0   | 1   | 40    | 0     | 40    | -2.20 | 0     | -2.20 | 1     | 0     | 1     | ... |
+| 8   | 1   | 0   | 1   | 45    | 0     | 45    | -0.37 | 0     | -0.37 | 0     | 0     | 0     | ... |
 
-**Table 4.1. BM Model (Entire Dataset) (N=334)**
+where (P), (F) and (M) represents for the "pooled", "female-only" and "male-only" data.
 
-| Variable                | Estimate                    | Std. Error      | t-Sta.               |
-| ----------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)              | 0.734                       | 0.279           | 2.635 \*\*           |
-| Two-way commute time    | -0.003                      | 0.003           | -0.852               |
-| Lack of manager support | -3.035                      | 0.366           | -8.299 \*\*          |
-| Office Discipline       | -0.850                      | 0.173           | -4.903 \*\*          |
-| $\mathcal{L}$: -161.150 | $\mathcal{L}(EL)$: -231.511 | $\rho^2$: 0.304 | Adj. $\rho^2$: 0.287 |
+Using this data, firstly, we apply the structure of BF model (i.e., variables) to the "male-only" dataset. It means the model uses only the columns "T", "M" and those with (M) suffix. It leads to our female-male (FM) model whose details are shown in the following table.
+
+**Table 4.1. FM Model (N=333)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (M)              | 0.627                       | 0.454                  | 1.381                       |
+| Two-way commute time (M)    | -0.003                      | 0.005                  | -0.637                      |
+| Commute stress (M)          | 0.596                       | 0.286                  | 2.080 \*\*                  |
+| Lack of manager support (M) | -1.900                      | 0.469                  | -4.051 \*\*                 |
+| Job unsuitability (M)       | -0.851                      | 0.402                  | -2.119 \*\*                 |
+| Age (binary grouping) (M)   | -0.008                      | 0.373                  | -0.020                      |
+| $\mathcal{L}$: -206.397     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.106 | Adj. $\rho^2_{(EL)}$: 0.080 |
+
+Apparently, the performance (goodness-of-fit) has largely dropped from the BF model, since the variable selection was not optimized for the male-only dataset. Still, there are some variables that keeps a significance with 95% confidential level. Looking at the estimates of the coefficients, all the magnitude of the estimates have been decreased from those in the BF model, which implies that the male group has more variance in those variables. Note that, because this model has been developed over 333 samples, we cannot directly compare the log-likelihood or $\rho^2$s to that of BF model (but can do with FP model which is introduced below).
+
+Next, we have applied the structure of BF model to the entire dataset, and obtained a new female-pooled (FP) model.
+
+**Table 4.2. FP Model (N=333)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (P)              | 1.764                       | 0.356                  | 4.953 \*\*                  |
+| Two-way commute time (P)    | -0.008                      | 0.004                  | -2.070 \*\*                 |
+| Commute stress (P)          | 0.982                       | 0.248                  | 3.952 \*\*                  |
+| Lack of manager support (P) | -2.649                      | 0.378                  | -7.005 \*\*                 |
+| Job unsuitability (P)       | -1.451                      | 0.322                  | -4.514 \*\*                 |
+| Age (binary grouping) (P)   | -0.536                      | 0.293                  | -1.828 \*                   |
+| $\mathcal{L}$: -149.025     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.354 | Adj. $\rho^2_{(EL)}$: 0.328 |
+
+The result is somehow the "medium" of the BF model and BM model, while all the variables keep their significance, the magnitude of them settled in the middle of those in BF model and those in FM model. This is because the generic variables treat all the observation equally. The log-likelihood and $rho^2_{(EL)}$s also resulted in the middle of those statistics of the BF and FM models. One notable difference is in the t-statistics. in the pool model, all the t-statistics except for age's coefficient have indeed increased. This is potentially due to the increase in the number of "valid" observations. Even though both FM and FP model has 333 observations, roughly the half (167) observations in the FM model has a zero vector as the variable, which does not contribute to estimating the output. Once the model 333 non-zero vectors as the independent variables, it will obtain an improvement in the t-statistics from that of BF/FM model, which has 166/167 valid observations.
+
+Since we have separately built two gender-specific models using male-only and female-only data, a model with all the gender-specific variables (i.e., use all the columns with suffix (F) and (M) in Table 3.2.) will have its estimate corresponding to that in the BF/FM model. The following table shows the result of our female-segmented (FS) model.
+
+**Table 4.3. FS Model (N=333)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (F)              | 3.536                       | 0.763                  | 4.632 \*\*                  |
+| (Constant) (M)              | 0.627                       | 0.454                  | 1.381                       |
+| Two-way commute time (F)    | -0.016                      | 0.008                  | -1.989 \*\*                 |
+| Two-way commute time (M)    | -0.003                      | 0.005                  | -0.637                      |
+| Commute stress (F)          | 1.726                       | 0.553                  | 3.124 \*\*                  |
+| Commute stress (M)          | 0.596                       | 0.286                  | 2.080 \*\*                  |
+| Lack of manager support (F) | -4.090                      | 0.736                  | -5.558 \*\*                 |
+| Lack of manager support (M) | -1.900                      | 0.469                  | -4.051 \*\*                 |
+| Job unsuitability (F)       | -2.574                      | 0.618                  | -4.164 \*\*                 |
+| Job unsuitability (M)       | -0.851                      | 0.402                  | -2.119 \*\*                 |
+| Age (binary grouping) (F)   | -1.512                      | 0.567                  | -2.668 \*\*                 |
+| Age (binary grouping) (M)   | -0.008                      | 0.373                  | -0.020                      |
+| $\mathcal{L}$: -138.387     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.400 | Adj. $\rho^2_{(EL)}$: 0.349 |
+
+As we could expect, all the coefficients, standard errors and then t-statistics match the ones estimated in BF (for (F) variables) and FM (for (M) variables) models. Theoretically we will see those values completely equal, but there are some tiny difference (e.g., estimate of commute stress (F) in FS model and that of commute stress in BF model) due to a computation error.
+
+To see the difference in the performance between pooled (FP) model and segmented (FS) model, we can conduct a $\chi^2$ test with the statistic of log-likelihood. Let the statistic be $L = -2(\mathcal{L}^R - \mathcal{L}^U)$, then we can make a hypothesis:
+
+$$
+\begin{cases}
+  H_0: \text{The performance of FS model is not significantly better than that of FP model} \Rightarrow L=0 \\
+  H_1: \text{Otherwise}
+\end{cases}
+$$
+
+(Note: the alternative hypothesis always states "otherwise", so we will not explicitly denote it in the rest of this document.)
+
+If the null hypothesis is true, $L$ will follow a chi-square distribution $\chi^2(d.f.=6)$. The degree of freedom 6 is the difference in the number of variables between FP and FS model. The p-value for this test can be evaluated by
+
+$$
+1 - \int_{-\infty}^{L} \chi^2(x,d.f.) dx = 1 - \int_{-\infty}^{-2(-149.025 + 138.387)} \chi^2(x,6) dx = 1 - \int_{-\infty}^{21.276} \chi^2(x,6) dx = 1.636 \times 10^{-3} \text{ **}
+$$
+
+Therefore, we can reject the null hypothesis with more than 99% confidence level and then conclude that the performance of FS model is significantly better than that of FP model.
+
+Also, we can apply a t-test to see whether each pair of coefficients, one is for (F) variable and the other is for (M) variable, is significantly different from each other. Let a new suffix (D) which represents the difference of the coefficients, then:
+
+$$
+\begin{cases}
+\hat{\beta}_{(D)} = \hat{\beta}_{(F)} - \hat{\beta}_{(M)} \\
+s.e.(\hat{\beta}_{(D)}) = \sqrt{s.e.(\hat{\beta}_{(F)})^2 + s.e.(\hat{\beta}_{(M)})^2}
+\end{cases}
+\Rightarrow t(\hat{\beta}_{(D)}) = \frac{\hat{\beta}_{(F)} - \hat{\beta}_{(M)}}{\sqrt{s.e.(\hat{\beta}_{(F)})^2 + s.e.(\hat{\beta}_{(M)})^2}}
+$$
+
+Consequently, our hypothesis for examining the equality of a pair of coefficients is:
+
+$$
+H_0: \hat{\beta}_{(D)} = \hat{\beta}_{(F)} - \hat{\beta}_{(M)} = 0
+$$
+
+and we can test this by looking at the p-value of the t-statistic.
+
+The following table summarizes the p-values of the $\hat{\beta}\_{(D)}$s in the FS model.
+
+**Table 4.4. Difference of a Pair of Coefficients in FS Model (N=333)**
+
+| Variable                    | Estimate | Std. Error | t-Sta.      |
+| --------------------------- | -------- | ---------- | ----------- |
+| (Constant) (D)              | 2.909    | 0.888      | 3.276 \*\*  |
+| Two-way commute time (D)    | -0.013   | 0.009      | -1.378      |
+| Commute stress (D)          | 1.130    | 0.623      | 1.815 \*    |
+| Lack of manager support (D) | -2.190   | 0.873      | -2.509 \*\* |
+| Job unsuitability (D)       | -1.723   | 0.737      | -2.337 \*\* |
+| Age (binary grouping) (D)   | -1.504   | 0.679      | -2.216 \*\* |
+
+This result implies that we should not treat the variables except for commute time as an all-gender variable. For example, a better model ought to contain two variable to evaluate the effect of age. When we admit that being older will differently effect to the decision whether a woman/man will telecommute or not, the performance of the new model is supposed to improve. The result of commute stress is somehow on the borderline as its significance fails to reach 95% but more than 90%, so we will treat them in two ways in the following section when we develop a partially segmented model.
+
+---
+
+Next, we conduct the same approach to the male-only (BM) model. The following tables illustrates the outcomes when we apply the structure of BM model to female-only dataset (i.e., columns T, F and those with suffix (F)), and to the entire dataset. The tables below displays the summary of the male-female(MF) model and male-pooled (MP) model.
+
+**Table 5.1. MF Model (N=337)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (F)              | 0.994                       | 0.233                  | 4.271 \*\*                  |
+| Lack of manager support (F) | -3.811                      | 0.573                  | -6.650 \*\*                 |
+| Office Discipline (F)       | -0.561                      | 0.256                  | -2.188 \*\*                 |
+| $\mathcal{L}$: -187.611     | $\mathcal{L}(EL)$: -233.591 | $\rho^2_{(EL)}$: 0.197 | Adj. $\rho^2_{(EL)}$: 0.184 |
+
+**Table 5.2. MP Model (N=337)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (P)              | 0.537                       | 0.151                  | 3.558 \*\*                  |
+| Lack of manager support (P) | -3.093                      | 0.367                  | -8.431 \*\*                 |
+| Office Discipline (P)       | -0.809                      | 0.170                  | -4.763 \*\*                 |
+| $\mathcal{L}$: -162.378     | $\mathcal{L}(EL)$: -233.591 | $\rho^2_{(EL)}$: 0.305 | Adj. $\rho^2_{(EL)}$: 0.292 |
+
+When applying the male model to female-only dataset, the estimate of the coefficients changes accordingly to the observations as we saw when we apply the female model to male-only dataset. Meanwhile, this time all the significances of the estimates clear 95% confidential level. Also, the estimates of the coefficients in MP model are somehow between that of BM model and MF model, which we have observed in applying the female model to male-only and entire dataset.
+
+**Table 5.3. MS Model (N=337)**
+
+| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant) (F)              | 0.994                       | 0.233                  | 4.271 \*\*                  |
+| (Constant) (M)              | 0.174                       | 0.205                  | 0.847                       |
+| Lack of manager support (F) | -3.811                      | 0.573                  | -6.650 \*\*                 |
+| Lack of manager support (M) | -2.512                      | 0.490                  | -5.128 \*\*                 |
+| Office Discipline (F)       | -0.561                      | 0.256                  | -2.188 \*\*                 |
+| Office Discipline (M)       | -0.937                      | 0.234                  | -4.006 \*\*                 |
+| $\mathcal{L}$: -157.827     | $\mathcal{L}(EL)$: -233.591 | $\rho^2_{(EL)}$: 0.324 | Adj. $\rho^2_{(EL)}$: 0.299 |
+
+**Table 5.4. Difference of a Pair of Coefficients in MS Model (N=333)**
+
+| Variable                    | Estimate | Std. Error | t-Sta.     |
+| --------------------------- | -------- | ---------- | ---------- |
+| (Constant) (D)              | 0.820    | 0.310      | 2.642 \*\* |
+| Lack of manager support (D) | -1.299   | 0.754      | -1.723 \*  |
+| Office Discipline (D)       | 0.376    | 0.347      | 1.084      |

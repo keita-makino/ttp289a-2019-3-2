@@ -2,56 +2,55 @@
 
 In this individual part, we will develop and argue several approaches in segmentation and taste variation, using the dataset that we used in homework 1.
 
----
-
 We first present the "best" models we have determined in the previous homework and then will try to improve the models by segmentation method. The models below are the best models (FSE: female, TMA: male) in homework 1.
 
-**Table 1.1. FSE Model (N=166)**
+**Table 1.1. FSE Model (N=166)**  
+_\*: \* and \*\* respectively represents that the variable is significant with 90%/95% confidential level, assuming the t-Statistics will follow a normal distribution. We approximate a t-distribution to normal distribution as the sample size is larger than 30 in all the cases. Will apply in the rest of the document._
 
-| Variable                          | Estimate                    | Std. Error      | t-Sta.               |
-| --------------------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)                        | -6.654                      | 147.086         | -0.045               |
-| Children less than 6 years of age | -1.136                      | 0.783           | -1.452 \*            |
-| Two-way commute time              | -0.017                      | 0.008           | -2.004 \*\*          |
-| Commute stress                    | 1.707                       | 0.560           | 3.046 \*\*           |
-| Some job can be done from home    | 10.664                      | 147.083         | 0.073                |
-| Lack of manager support           | -4.161                      | 0.779           | 5.341 \*\*           |
-| Job unsuitability                 | -2.327                      | 0.663           | -3.513 \*\*          |
-| Age (binary grouping)             | -1.846                      | 0.677           | -2.727 \*\*          |
-| $\mathcal{L}$: -44.644            | $\mathcal{L}(EL)$: -115.062 | $\rho^2$: 0.612 | Adj. $\rho^2$: 0.543 |
+| Variable                          | Estimate                    | Std. Error             | t-Sta.                      |
+| --------------------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant)                        | -6.654                      | 147.086                | -0.045                      |
+| Children less than 6 years of age | -1.136                      | 0.783                  | -1.452                      |
+| Two-way commute time              | -0.017                      | 0.008                  | -2.004 \*\*                 |
+| Commute stress                    | 1.707                       | 0.560                  | 3.046 \*\*                  |
+| Some job can be done from home    | 10.664                      | 147.083                | 0.073                       |
+| Lack of manager support           | -4.161                      | 0.779                  | 5.341 \*\*                  |
+| Job unsuitability                 | -2.327                      | 0.663                  | -3.513 \*\*                 |
+| Age (binary grouping)             | -1.846                      | 0.677                  | -2.727 \*\*                 |
+| $\mathcal{L}$: -44.644            | $\mathcal{L}(EL)$: -115.062 | $\rho^2_{(EL)}$: 0.612 | Adj. $\rho^2_{(EL)}$: 0.543 |
 
 **Table 1.2. TMA Model (N=167)**
 
-| Variable                       | Estimate                    | Std. Error      | t-Sta.               |
-| ------------------------------ | --------------------------- | --------------- | -------------------- |
-| (Constant)                     | -8.762                      | 24.669          | -0.355               |
-| Two-way commute time           | -0.004                      | 0.005           | -0.882               |
-| Some job can be done from home | 9.288                       | 24.669          | 0.381                |
-| Lack of manager support        | -2.031                      | 0.502           | -4.046 \*\*          |
-| Office Discipline              | -1.173                      | 0.281           | -4.178 \*\*          |
-| $\mathcal{L}$: -77.035         | $\mathcal{L}(EL)$: -115.756 | $\rho^2$: 0.335 | Adj. $\rho^2$: 0.291 |
+| Variable                       | Estimate                    | Std. Error             | t-Sta.                      |
+| ------------------------------ | --------------------------- | ---------------------- | --------------------------- |
+| (Constant)                     | -8.762                      | 24.669                 | -0.355                      |
+| Two-way commute time           | -0.004                      | 0.005                  | -0.882                      |
+| Some job can be done from home | 9.288                       | 24.669                 | 0.381                       |
+| Lack of manager support        | -2.031                      | 0.502                  | -4.046 \*\*                 |
+| Office Discipline              | -1.173                      | 0.281                  | -4.178 \*\*                 |
+| $\mathcal{L}$: -77.035         | $\mathcal{L}(EL)$: -115.756 | $\rho^2_{(EL)}$: 0.335 | Adj. $\rho^2_{(EL)}$: 0.291 |
 
-We have removed a participant from the model creation if they have more than an invalid value in the variables (e.g., negative commute time) shown in each model. Note that, in this part we used `apollo` package in R whereas in the previous document we coded the logit model by ourselves. Therefore, some of the estimates have varied from what appeared in the homework 1 document. Typically, the variable "jobhome" (some job can be done from home) no longer be significant in the model in both cases. It is an odd behavior but now we should remove the variable from the base models as it seems causing a singularity (perfect estimation) problem. Therefore, the base models (BF: female, BM: male) would have the following structure.
+We have removed a participant from the model creation if they have more than an invalid value in the variables (e.g., negative commute time) shown in each model. Note that, in this part we used `apollo` package in R whereas in the previous document we coded the logit model by ourselves. Therefore, some of the estimates have varied from what appeared in the homework 1 document. Typically, the variable "jobhome" (some job can be done from home) no longer be significant in the model in both cases. It is an odd behavior that the variable have an extremely high standard error as well as the standard error of the constant, but now we should remove the variable from the base models as it seems causing a singularity (perfect estimation) problem. Also, presence of young children at home in female model and two-way commute time in male model were not identified as a significant variable so that we will remove these two variables as well. Consequently, the base models (BF: female, BM: male) would have the following structure.
 
 **Table 2.1. BF Model (N=166)**
 
-| Variable                          | Estimate                    | Std. Error      | t-Sta.               |
-| --------------------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)                        | 4.055                       | 0.885           | 4.581 \*\*           |
-| Children less than 6 years of age | -1.098                      | 0.784           | -1.400 \*            |
-| Two-way commute time              | -0.017                      | 0.008           | -1.986 \*\*          |
-| Commute stress                    | 1.846                       | 0.565           | 3.268 \*\*           |
-| Lack of manager support           | -4.291                      | 0.774           | 5.543 \*\*           |
-| Job unsuitability                 | -2.670                      | 0.634           | -4.214 \*\*          |
-| Age (binary grouping)             | -1.930                      | 0.662           | -2.918 \*\*          |
-| $\mathcal{L}$: -44.644            | $\mathcal{L}(EL)$: -115.062 | $\rho^2$: 0.612 | Adj. $\rho^2$: 0.543 |
+| Variable                | Estimate                    | Std. Error             | t-Sta.                      |
+| ----------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant)              | 3.536                       | 0.764                  | 4.632 \*\*                  |
+| Two-way commute time    | -0.016                      | 0.008                  | -1.989 \*\*                 |
+| Commute stress          | 1.727                       | 0.553                  | 3.124 \*\*                  |
+| Lack of manager support | -4.090                      | 0.736                  | -5.558 \*\*                 |
+| Job unsuitability       | -2.574                      | 0.618                  | -4.164 \*\*                 |
+| Age (binary grouping)   | -1.512                      | 0.567                  | -2.668 \*\*                 |
+| $\mathcal{L}$: -47.053  | $\mathcal{L}(EL)$: -115.062 | $\rho^2_{(EL)}$: 0.591 | Adj. $\rho^2_{(EL)}$: 0.539 |
 
-**Table 2.2. BM Model (N=167)**
+**Table 2.2. BM Model (N=169)**
 
-| Variable                | Estimate                    | Std. Error      | t-Sta.               |
-| ----------------------- | --------------------------- | --------------- | -------------------- |
-| (Constant)              | 0.224                       | 0.388           | 0.579                |
-| Two-way commute time    | -0.001                      | 0.004           | -0.157               |
-| Lack of manager support | -2.401                      | 0.484           | -4.960 \*\*          |
-| Office Discipline       | -1.015                      | 0.246           | -4.125 \*\*          |
-| $\mathcal{L}$: -86.220  | $\mathcal{L}(EL)$: -115.756 | $\rho^2$: 0.255 | Adj. $\rho^2$: 0.221 |
+| Variable                | Estimate                    | Std. Error             | t-Sta.                      |
+| ----------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant)              | 0.174                       | 0.205                  | 0.846                       |
+| Lack of manager support | -2.512                      | 0.490                  | -5.128 \*\*                 |
+| Office Discipline       | -0.936                      | 0.234                  | -4.006 \*\*                 |
+| $\mathcal{L}$: -87.358  | $\mathcal{L}(EL)$: -117.142 | $\rho^2_{(EL)}$: 0.254 | Adj. $\rho^2_{(EL)}$: 0.229 |
+
+We will discuss how to apply these models to the segmented dataset in the next section.

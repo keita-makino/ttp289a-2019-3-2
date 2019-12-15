@@ -1,14 +1,11 @@
-female = function(database) {
-  apollo_beta = c(asc_tele = 0,
-                  asc_nontele = 0,
-                  b_childlt6 = 0,
-                  b_commtime = 0,
-                  b_efact9 = 0,
-                  b_manconst = 0,
-                  b_jobconst = 0,
-                  b_age = 0)
+malef = function(database) {
+  apollo_beta = c(
+    asc_tele_f = 0,
+    b_manconst_f = 0,
+    b_cso9ft2_f = 0
+  )
   
-  apollo_fixed = c("asc_nontele")
+  apollo_fixed = c()
   
   apollo_control = list(modelName = "MNL",
                         modelDescr = "SimpleMNL",
@@ -18,7 +15,7 @@ female = function(database) {
   
   model = apollo_estimate(apollo_beta,
                           apollo_fixed,
-                          prob_female,
+                          prob_malef,
                           apollo_inputs)
   source("./output.R")
   output(model)
@@ -27,9 +24,9 @@ female = function(database) {
 }
 
 
-prob_female = function(apollo_beta,
-                     apollo_inputs,
-                     functionality = "estimate") {
+prob_malef = function(apollo_beta,
+                        apollo_inputs,
+                        functionality = "estimate") {
   apollo_attach(apollo_beta,
                 apollo_inputs)
   on.exit(apollo_detach(apollo_beta, apollo_inputs))
@@ -37,11 +34,11 @@ prob_female = function(apollo_beta,
   P = list()
   V = list()
   
-  V[["tele"]] = asc_tele + b_childlt6 * childlt6 +
-    b_commtime * commtime + b_efact9 * efact9 + 
-     b_manconst * manconst + 
-    b_jobconst * jobconst + b_age * age
-  V[["nontele"]] = asc_nontele
+  V[["tele"]] = 
+    asc_tele_f * gender_f +
+    b_manconst_f * manconst_f +
+    b_cso9ft2_f * cso9ft2_f
+  V[["nontele"]] = 0
   
   mnl_settings = list(
     alternatives = c(tele = 1, nontele = 0),

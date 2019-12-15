@@ -6,16 +6,15 @@ library("dplyr")
 library("apollo")
 
 data = read.csv("../data/data.csv")
-femaleIndex = data$female == 1
-maleIndex = data$female ==0
-
+femaleIndex = data$gender == 1
+maleIndex = data$gender ==0
 
 apollo_initialise()
 
 source("./female.R")
 bf = female(data[femaleIndex,] %>% .[, c(
   "id",
-  "c3h17m" ,
+  "c3h17m",
   "childlt6",
   "commtime",
   "efact9",
@@ -28,18 +27,17 @@ bf = female(data[femaleIndex,] %>% .[, c(
 source("./male.R")
 bm = male(data[maleIndex,] %>% .[, c(
   "id",
-  "c3h17m" ,
+  "c3h17m",
   "commtime",
   "jobhome",
   "manconst",
   "cso9ft2"
 )] %>% .[complete.cases(.), ])
 
-source("./female2.R")
-bf2 = female(data[femaleIndex,] %>% .[, c(
+source("./femalep.R")
+bf2 = femalep(data[femaleIndex,] %>% .[, c(
   "id",
-  "c3h17m" ,
-  "childlt6",
+  "c3h17m",
   "commtime",
   "efact9",
   "manconst",
@@ -47,54 +45,61 @@ bf2 = female(data[femaleIndex,] %>% .[, c(
   "age"
 )] %>% .[complete.cases(.), ])
 
-source("./male2.R")
-bm2 = male(data[maleIndex,] %>% .[, c(
+source("./malep.R")
+bm2 = malep(data[maleIndex,] %>% .[, c(
   "id",
-  "c3h17m" ,
-  "commtime",
+  "c3h17m",
   "manconst",
   "cso9ft2"
 )] %>% .[complete.cases(.), ])
 
-database = data[maleIndex,] %>% .[complete.cases(.), ]
-femaleIndex = database$female == 1
-maleIndex = database$female ==0
-
-source("./female2.R")
-bfm = female(database[maleIndex,] %>% .[, c(
+indexf = data[, c(
   "id",
-  "c3h17m" ,
-  "childlt6",
+  "c3h17m",
   "commtime",
   "efact9",
   "manconst",
   "jobconst",
   "age"
-)] %>% .[complete.cases(.), ])
-bfe = female(database[, c(
+)] %>% .[complete.cases(.), ] %>% .$id
+databasef = data[indexf,]
+
+source("./femalem.R")
+fm = femalem(databasef)
+source("./femalep.R")
+fp = femalep(databasef)
+source("./females.R")
+fs = females(databasef)
+
+indexm = data[, c(
   "id",
-  "c3h17m" ,
-  "childlt6",
+  "c3h17m",
+  "manconst",
+  "cso9ft2"
+)] %>% .[complete.cases(.), ] %>% .$id
+databasem = data[indexm,]
+
+source("./malef.R")
+mf = malef(databasem)
+source("./malep.R")
+mp = malep(databasem)
+source("./males.R")
+ms = males(databasem)
+
+indexp = data[, c(
+  "id",
+  "c3h17m",
   "commtime",
   "efact9",
   "manconst",
   "jobconst",
+  "cso9ft2",
   "age"
-)] %>% .[complete.cases(.), ])
+)] %>% .[complete.cases(.), ] %>% .$id
+databasep = data[indexp,]
 
+source("./ps1.R")
+ps1 = ps1(databasep)
+source("./ps2.R")
+ps2 = ps2(databasep)
 
-source("./male2.R")
-bmf = male(database[femaleIndex,] %>% .[, c(
-  "id",
-  "c3h17m" ,
-  "commtime",
-  "manconst",
-  "cso9ft2"
-)] %>% .[complete.cases(.), ])
-bme = male(database[, c(
-  "id",
-  "c3h17m" ,
-  "commtime",
-  "manconst",
-  "cso9ft2"
-)] %>% .[complete.cases(.), ])
