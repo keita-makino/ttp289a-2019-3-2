@@ -2,7 +2,7 @@
 
 In this section, we will explore several segmentation method that may improve the "best" model introduced in the previous section. In this assignment, we pick the gender as the target of the segmentation.
 
-First of all, we need a data conversion to make a segmented model. Assuming that the original dataset has the following structure:
+For this section and later, we have made a data conversion to make a segmented model. Assuming that the original dataset has the following structure:
 
 **Table 3.1. Structure of Original Dataset**
 
@@ -16,6 +16,7 @@ First of all, we need a data conversion to make a segmented model. Assuming that
 | 6   | 1                 | 0          | 40                | 1.72                   | 1                   | ... |
 | 7   | 0                 | 0          | 40                | -2.20                  | 1                   | ... |
 | 8   | 1                 | 0          | 45                | -0.37                  | 0                   | ... |
+| ... | ...               | ...        | ...               | ...                    | ...                 | ... |
 
 then we convert the table to the following structure:
 
@@ -31,26 +32,28 @@ then we convert the table to the following structure:
 | 6   | 1   | 0   | 1   | 40    | 0     | 40    | 1.72  | 0     | 1.72  | 1     | 0     | 1     | ... |
 | 7   | 0   | 0   | 1   | 40    | 0     | 40    | -2.20 | 0     | -2.20 | 1     | 0     | 1     | ... |
 | 8   | 1   | 0   | 1   | 45    | 0     | 45    | -0.37 | 0     | -0.37 | 0     | 0     | 0     | ... |
+| ... | ... | ... | ... | ...   | ...   | ...   | ...   | ...   | ...   | ...   | ...   | ...   | ... |
 
 where (P), (F) and (M) represents for the "pooled", "female-only" and "male-only" data.
 
-Using this data, firstly, we apply the structure of BF model (i.e., variables) to the "male-only" dataset. It means the model uses only the columns "T", "M" and those with (M) suffix. It leads to our female-male (FM) model whose details are shown in the following table.
+Using this data, first of all, we apply the structure of FB model (i.e., variables) to the "male-only" dataset. It means the model uses only the rows where $M=1$. It leads to our female-male (FM) model whose details are shown in the following table.
 
-**Table 4.1. FM Model (N=333)**
+**Table 4.1. FM Model (N=167)**
 
-| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
-| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
-| (Constant) (M)              | 0.627                       | 0.454                  | 1.381                       |
-| Two-way commute time (M)    | -0.003                      | 0.005                  | -0.637                      |
-| Commute stress (M)          | 0.596                       | 0.286                  | 2.080 \*\*                  |
-| Lack of manager support (M) | -1.900                      | 0.469                  | -4.051 \*\*                 |
-| Job unsuitability (M)       | -0.851                      | 0.402                  | -2.119 \*\*                 |
-| Age (binary grouping) (M)   | -0.008                      | 0.373                  | -0.020                      |
-| $\mathcal{L}$: -206.397     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.106 | Adj. $\rho^2_{(EL)}$: 0.080 |
+| Variable                | Estimate                    | Std. Error             | t-Sta.                      |
+| ----------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant)              | 0.627                       | 0.454                  | 1.381                       |
+| Two-way commute time    | -0.003                      | 0.005                  | -0.637                      |
+| Commute stress          | 0.596                       | 0.286                  | 2.080 \*\*                  |
+| Lack of manager support | -1.900                      | 0.469                  | -4.051 \*\*                 |
+| Job unsuitability       | -0.851                      | 0.402                  | -2.119 \*\*                 |
+| Age (binary grouping)   | -0.008                      | 0.373                  | -0.020                      |
+| $\mathcal{L}$: -91.334  | $\mathcal{L}(EL)$: -115.756 | $\rho^2_{(EL)}$: 0.211 | Adj. $\rho^2_{(EL)}$: 0.159 |
+|                         | $\mathcal{L}(MS)$: -112.061 | $\rho^2_{(MS)}$: 0.185 | Adj. $\rho^2_{(MS)}$: 0.140 |
 
-Apparently, the performance (goodness-of-fit) has largely dropped from the BF model, since the variable selection was not optimized for the male-only dataset. Still, there are some variables that keeps a significance with 95% confidential level. Looking at the estimates of the coefficients, all the magnitude of the estimates have been decreased from those in the BF model, which implies that the male group has more variance in those variables. Note that, because this model has been developed over 333 samples, we cannot directly compare the log-likelihood or $\rho^2$s to that of BF model (but can do with FP model which is introduced below).
+Clearly, the performance (goodness-of-fit) has largely dropped from the FB model, since the variable selection was not optimized for the male-only dataset. Still, there are some variables that keeps a significance with 95% confidential level. Looking at the estimates of the coefficients, all the magnitude of the estimates have been decreased from those in the FB model, which implies that the male group has more variance in those variables. Note that, because this model has been developed with male-only dataset of 167 samples, we cannot directly compare the log-likelihood or $\rho^2$s to that of FB model.
 
-Next, we have applied the structure of BF model to the entire dataset, and obtained a new female-pooled (FP) model.
+Next, we have applied the structure of FB model to the entire dataset, and obtained a new female-pooled (FP) model.
 
 **Table 4.2. FP Model (N=333)**
 
@@ -63,32 +66,36 @@ Next, we have applied the structure of BF model to the entire dataset, and obtai
 | Job unsuitability (P)       | -1.451                      | 0.322                  | -4.514 \*\*                 |
 | Age (binary grouping) (P)   | -0.536                      | 0.293                  | -1.828 \*                   |
 | $\mathcal{L}$: -149.025     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.354 | Adj. $\rho^2_{(EL)}$: 0.328 |
+|                             | $\mathcal{L}(MS)$: -228.288 | $\rho^2_{(MS)}$: 0.347 | Adj. $\rho^2_{(MS)}$: 0.325 |
 
-The result is somehow the "medium" of the BF model and BM model, while all the variables keep their significance, the magnitude of them settled in the middle of those in BF model and those in FM model. This is because the generic variables treat all the observation equally. The log-likelihood and $rho^2_{(EL)}$s also resulted in the middle of those statistics of the BF and FM models. One notable difference is in the t-statistics. in the pool model, all the t-statistics except for age's coefficient have indeed increased. This is potentially due to the increase in the number of "valid" observations. Even though both FM and FP model has 333 observations, roughly the half (167) observations in the FM model has a zero vector as the variable, which does not contribute to estimating the output. Once the model 333 non-zero vectors as the independent variables, it will obtain an improvement in the t-statistics from that of BF/FM model, which has 166/167 valid observations.
+The result is somehow the "medium" of the FB model and FM model, while all the variables keep their significance, the magnitude of them settled in the middle of those in FB model and those in FM model. This is because the generic variables treat all the observation equally. The log-likelihood and $\rho^2$s also resulted in the middle of those statistics of the FB and FM models. One notable difference is in the t-statistics. In the pool model, all the magnitude of t-statistics except for age's coefficient have increased from both FB anf FM model. This would be due to the increase in the number of observations.
 
-Since we have separately built two gender-specific models using male-only and female-only data, a model with all the gender-specific variables (i.e., use all the columns with suffix (F) and (M) in Table 3.2.) will have its estimate corresponding to that in the BF/FM model. The following table shows the result of our female-segmented (FS) model.
+Since we have separately built two gender-specific models using male-only and female-only data, a model with all the gender-specific variables (i.e., use all the columns with suffix (F) and (M) in Table 3.2.) will have its estimate corresponding to that in the FB/FM model. The following table shows the result of our female-segmented (FS) model.
 
 **Table 4.3. FS Model (N=333)**
 
-| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
-| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
-| (Constant) (F)              | 3.536                       | 0.763                  | 4.632 \*\*                  |
-| (Constant) (M)              | 0.627                       | 0.454                  | 1.381                       |
-| Two-way commute time (F)    | -0.016                      | 0.008                  | -1.989 \*\*                 |
-| Two-way commute time (M)    | -0.003                      | 0.005                  | -0.637                      |
-| Commute stress (F)          | 1.726                       | 0.553                  | 3.124 \*\*                  |
-| Commute stress (M)          | 0.596                       | 0.286                  | 2.080 \*\*                  |
-| Lack of manager support (F) | -4.090                      | 0.736                  | -5.558 \*\*                 |
-| Lack of manager support (M) | -1.900                      | 0.469                  | -4.051 \*\*                 |
-| Job unsuitability (F)       | -2.574                      | 0.618                  | -4.164 \*\*                 |
-| Job unsuitability (M)       | -0.851                      | 0.402                  | -2.119 \*\*                 |
-| Age (binary grouping) (F)   | -1.512                      | 0.567                  | -2.668 \*\*                 |
-| Age (binary grouping) (M)   | -0.008                      | 0.373                  | -0.020                      |
-| $\mathcal{L}$: -138.387     | $\mathcal{L}(EL)$: -230.818 | $\rho^2_{(EL)}$: 0.400 | Adj. $\rho^2_{(EL)}$: 0.349 |
+| Variable                    | Estimate                      | Std. Error             | t-Sta.                      |
+| --------------------------- | ----------------------------- | ---------------------- | --------------------------- |
+| (Constant) (F)              | 3.536                         | 0.763                  | 4.632 \*\*                  |
+| (Constant) (M)              | 0.627                         | 0.454                  | 1.381                       |
+| Two-way commute time (F)    | -0.016                        | 0.008                  | -1.989 \*\*                 |
+| Two-way commute time (M)    | -0.003                        | 0.005                  | -0.637                      |
+| Commute stress (F)          | 1.726                         | 0.553                  | 3.124 \*\*                  |
+| Commute stress (M)          | 0.596                         | 0.286                  | 2.080 \*\*                  |
+| Lack of manager support (F) | -4.090                        | 0.736                  | -5.558 \*\*                 |
+| Lack of manager support (M) | -1.900                        | 0.469                  | -4.051 \*\*                 |
+| Job unsuitability (F)       | -2.574                        | 0.618                  | -4.164 \*\*                 |
+| Job unsuitability (M)       | -0.851                        | 0.402                  | -2.119 \*\*                 |
+| Age (binary grouping) (F)   | -1.512                        | 0.567                  | -2.668 \*\*                 |
+| Age (binary grouping) (M)   | -0.008                        | 0.373                  | -0.020                      |
+| $\mathcal{L}$: -138.387     | $\mathcal{L}(EL)$: -230.818   | $\rho^2_{(EL)}$: 0.400 | Adj. $\rho^2_{(EL)}$: 0.349 |
+|                             | $\mathcal{L}(MS)$\*: -227.015 | $\rho^2_{(MS)}$: 0.390 | Adj. $\rho^2_{(MS)}$: 0.346 |
 
-As we could expect, all the coefficients, standard errors and then t-statistics match the ones estimated in BF (for (F) variables) and FM (for (M) variables) models. Theoretically we will see those values completely equal, but there are some tiny difference (e.g., estimate of commute stress (F) in FS model and that of commute stress in BF model) due to a computation error.
+\*: MS model has two ASCs for female and male. Will apply for the rest of segmented models in the document.
 
-To see the difference in the performance between pooled (FP) model and segmented (FS) model, we can conduct a $\chi^2$ test with the statistic of log-likelihood. Let the statistic be $L = -2(\mathcal{L}^R - \mathcal{L}^U)$, then we can make a hypothesis:
+As we could expect, all the coefficients, standard errors and then t-statistics match the ones estimated in FB (for (F) variables) and FM (for (M) variables) models. Theoretically we will see those values completely equal, but there are some tiny difference (e.g., estimate of commute stress (F) in FS model and that of commute stress in FB model) due to a computation error.
+
+To see the difference in the performance between pooled (FP) model and segmented (FS) model, we can conduct a $\chi^2$ test. Let the statistic be $L = -2(\mathcal{L}^R - \mathcal{L}^U)$, then we can make a hypothesis:
 
 $$
 \begin{cases}
@@ -123,7 +130,7 @@ $$
 H_0: \hat{\beta}_{(D)} = \hat{\beta}_{(F)} - \hat{\beta}_{(M)} = 0
 $$
 
-and we can test this by looking at the p-value of the t-statistic.
+and we can test this by looking at the p-value of the t-statistic. (Note: this is a simplified test where we do not account the difference in variance of error terms of female/male groups.)
 
 The following table summarizes the p-values of the $\hat{\beta}\_{(D)}$s in the FS model.
 
@@ -142,16 +149,17 @@ This result implies that we should not treat the variables except for commute ti
 
 ---
 
-Next, we conduct the same approach to the male-only (BM) model. The following tables illustrates the outcomes when we apply the structure of BM model to female-only dataset (i.e., columns T, F and those with suffix (F)), and to the entire dataset. The tables below displays the summary of the male-female(MF) model and male-pooled (MP) model.
+Next, we conduct the same approach to the male-only (MB) model. The following tables illustrates the outcomes when we apply the structure of MB model to female-only dataset (i.e., columns T, F and those with suffix (F)), and to the entire dataset. The tables below displays the summary of the male-female(MF) model and male-pooled (MP) model.
 
-**Table 5.1. MF Model (N=337)**
+**Table 5.1. MF Model (N=168)**
 
-| Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
-| --------------------------- | --------------------------- | ---------------------- | --------------------------- |
-| (Constant) (F)              | 0.994                       | 0.233                  | 4.271 \*\*                  |
-| Lack of manager support (F) | -3.811                      | 0.573                  | -6.650 \*\*                 |
-| Office Discipline (F)       | -0.561                      | 0.256                  | -2.188 \*\*                 |
-| $\mathcal{L}$: -187.611     | $\mathcal{L}(EL)$: -233.591 | $\rho^2_{(EL)}$: 0.197 | Adj. $\rho^2_{(EL)}$: 0.184 |
+| Variable                | Estimate                    | Std. Error             | t-Sta.                      |
+| ----------------------- | --------------------------- | ---------------------- | --------------------------- |
+| (Constant)              | 0.994                       | 0.233                  | 4.271 \*\*                  |
+| Lack of manager support | -3.811                      | 0.573                  | -6.650 \*\*                 |
+| Office Discipline       | -0.561                      | 0.256                  | -2.188 \*\*                 |
+| $\mathcal{L}$: -70.469  | $\mathcal{L}(EL)$: -116.449 | $\rho^2_{(EL)}$: 0.395 | Adj. $\rho^2_{(EL)}$: 0.369 |
+|                         | $\mathcal{L}(MS)$: -116.258 | $\rho^2_{(MS)}$: 0.394 | Adj. $\rho^2_{(MS)}$: 0.377 |
 
 **Table 5.2. MP Model (N=337)**
 
@@ -161,10 +169,13 @@ Next, we conduct the same approach to the male-only (BM) model. The following ta
 | Lack of manager support (P) | -3.093                      | 0.367                  | -8.431 \*\*                 |
 | Office Discipline (P)       | -0.809                      | 0.170                  | -4.763 \*\*                 |
 | $\mathcal{L}$: -162.378     | $\mathcal{L}(EL)$: -233.591 | $\rho^2_{(EL)}$: 0.305 | Adj. $\rho^2_{(EL)}$: 0.292 |
+|                             | $\mathcal{L}(MS)$: -229.317 | $\rho^2_{(MS)}$: 0.292 | Adj. $\rho^2_{(MS)}$: 0.283 |
 
-When applying the male model to female-only dataset, the estimate of the coefficients changes accordingly to the observations as we saw when we apply the female model to male-only dataset. Meanwhile, this time all the significances of the estimates clear 95% confidential level. Also, the estimates of the coefficients in MP model are somehow between that of BM model and MF model, which we have observed in applying the female model to male-only and entire dataset.
+When applying the male model to female-only dataset, the estimate of the coefficients changes accordingly to the observations as we saw when we apply the female model to male-only dataset. Meanwhile, this time all the significances of the estimates clear 95% confidential level. Also, the estimates of the coefficients in MP model are somehow between that of MB model and MF model, which we have observed in applying the female model to male-only and entire dataset. Interestingly, the goodness-of-fit is better when we apply the male model to female dataset. This implies that the random term is larger in male dataset.
 
-**Table 5.3. MS Model (N=337)**
+Using the converted dataset, we then trained a new male-segmented (MS': to avoid conflicting with MS model) model, whose details are descried in the following table.
+
+**Table 5.3. MS' Model (N=337)**
 
 | Variable                    | Estimate                    | Std. Error             | t-Sta.                      |
 | --------------------------- | --------------------------- | ---------------------- | --------------------------- |
@@ -175,11 +186,32 @@ When applying the male model to female-only dataset, the estimate of the coeffic
 | Office Discipline (F)       | -0.561                      | 0.256                  | -2.188 \*\*                 |
 | Office Discipline (M)       | -0.937                      | 0.234                  | -4.006 \*\*                 |
 | $\mathcal{L}$: -157.827     | $\mathcal{L}(EL)$: -233.591 | $\rho^2_{(EL)}$: 0.324 | Adj. $\rho^2_{(EL)}$: 0.299 |
+|                             | $\mathcal{L}(MS)$: -229.317 | $\rho^2_{(MS)}$: 0.312 | Adj. $\rho^2_{(MS)}$: 0.294 |
 
-**Table 5.4. Difference of a Pair of Coefficients in MS Model (N=333)**
+Again, the coefficients, standard errors and t-statistics are equal to what we have evaluated with MB and MF model.
+
+We can perform the same set of the test to the MP and MS' model. First, we conduct a $\chi^2$ test with the statistic $L$:
+
+$$
+H_0: \text{The performance of MS' model is not significantly better than that of MP model} \Rightarrow L=0 \\
+$$
+
+$L$ will follow $\chi^2(d.f.=3)$ under $H_0$. The p-value for this test can be evaluated by
+
+$$
+1 - \int_{-\infty}^{L} \chi^2(x,d.f.) dx = 1 - \int_{-\infty}^{-2(-162.378 + 157.827)} \chi^2(x,3) dx = 1 - \int_{-\infty}^{9.102} \chi^2(x,3) dx = 2.797 \times 10^{-2} \text{ **}
+$$
+
+Therefore, we can reject the null hypothesis with more than 95% confidence level. It means that the performance of MS' model is significantly better than that of MP model.
+
+Also, we can apply a t-test to each pair of coefficients as we have done above. The following table summarizes the p-values of the $\hat{\beta}_{(D)}$s in the MS' model.
+
+**Table 5.4. Difference of a Pair of Coefficients in MS' Model (N=337)**
 
 | Variable                    | Estimate | Std. Error | t-Sta.     |
 | --------------------------- | -------- | ---------- | ---------- |
 | (Constant) (D)              | 0.820    | 0.310      | 2.642 \*\* |
 | Lack of manager support (D) | -1.299   | 0.754      | -1.723 \*  |
 | Office Discipline (D)       | 0.376    | 0.347      | 1.084      |
+
+The result indicates that we can treat the effect of office discipline as all-gender effect. The lack of manager support exhibits a different indication from that we have obtained in the FS model. We will develop two partially-segmented models in the next section to examine this quality.

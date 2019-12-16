@@ -12,7 +12,19 @@ maleIndex = data$gender ==0
 apollo_initialise()
 
 source("./female.R")
-bf = female(data[femaleIndex,] %>% .[, c(
+source("./market.R")
+fb = female(data[femaleIndex,] %>% .[, c(
+  "id",
+  "c3h17m",
+  "childlt6",
+  "commtime",
+  "efact9",
+  "jobhome",
+  "manconst",
+  "jobconst",
+  "age"
+)] %>% .[complete.cases(.), ])
+fbm = market(data[femaleIndex,] %>% .[, c(
   "id",
   "c3h17m",
   "childlt6",
@@ -25,7 +37,15 @@ bf = female(data[femaleIndex,] %>% .[, c(
 )] %>% .[complete.cases(.), ])
 
 source("./male.R")
-bm = male(data[maleIndex,] %>% .[, c(
+mb = male(data[maleIndex,] %>% .[, c(
+  "id",
+  "c3h17m",
+  "commtime",
+  "jobhome",
+  "manconst",
+  "cso9ft2"
+)] %>% .[complete.cases(.), ])
+mbm = market(data[maleIndex,] %>% .[, c(
   "id",
   "c3h17m",
   "commtime",
@@ -35,7 +55,16 @@ bm = male(data[maleIndex,] %>% .[, c(
 )] %>% .[complete.cases(.), ])
 
 source("./femalep.R")
-bf2 = femalep(data[femaleIndex,] %>% .[, c(
+fb2 = femalep(data[femaleIndex,] %>% .[, c(
+  "id",
+  "c3h17m",
+  "commtime",
+  "efact9",
+  "manconst",
+  "jobconst",
+  "age"
+)] %>% .[complete.cases(.), ])
+fb2m = market(data[femaleIndex,] %>% .[, c(
   "id",
   "c3h17m",
   "commtime",
@@ -46,7 +75,13 @@ bf2 = femalep(data[femaleIndex,] %>% .[, c(
 )] %>% .[complete.cases(.), ])
 
 source("./malep.R")
-bm2 = malep(data[maleIndex,] %>% .[, c(
+mb2 = malep(data[maleIndex,] %>% .[, c(
+  "id",
+  "c3h17m",
+  "manconst",
+  "cso9ft2"
+)] %>% .[complete.cases(.), ])
+mb2m = market(data[maleIndex,] %>% .[, c(
   "id",
   "c3h17m",
   "manconst",
@@ -65,11 +100,13 @@ indexf = data[, c(
 databasef = data[indexf,]
 
 source("./femalem.R")
-fm = femalem(databasef)
+fm = femalem(databasef[databasef$gender == 0,])
 source("./femalep.R")
 fp = femalep(databasef)
 source("./females.R")
 fs = females(databasef)
+source("./markets.R")
+fsm = markets(databasef)
 
 indexm = data[, c(
   "id",
@@ -80,7 +117,7 @@ indexm = data[, c(
 databasem = data[indexm,]
 
 source("./malef.R")
-mf = malef(databasem)
+fm = malef(databasem[databasem$gender == 1,])
 source("./malep.R")
 mp = malep(databasem)
 source("./males.R")

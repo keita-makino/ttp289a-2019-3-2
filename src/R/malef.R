@@ -1,8 +1,8 @@
 malef = function(database) {
   apollo_beta = c(
-    asc_tele_f = 0,
-    b_manconst_f = 0,
-    b_cso9ft2_f = 0
+    asc = 0,
+    b_manconst = 0,
+    b_cso9ft2 = 0
   )
   
   apollo_fixed = c()
@@ -25,8 +25,8 @@ malef = function(database) {
 
 
 prob_malef = function(apollo_beta,
-                        apollo_inputs,
-                        functionality = "estimate") {
+                      apollo_inputs,
+                      functionality = "estimate") {
   apollo_attach(apollo_beta,
                 apollo_inputs)
   on.exit(apollo_detach(apollo_beta, apollo_inputs))
@@ -35,9 +35,9 @@ prob_malef = function(apollo_beta,
   V = list()
   
   V[["tele"]] = 
-    asc_tele_f * gender_f +
-    b_manconst_f * manconst_f +
-    b_cso9ft2_f * cso9ft2_f
+    asc +
+    b_manconst * manconst +
+    b_cso9ft2 * cso9ft2
   V[["nontele"]] = 0
   
   mnl_settings = list(

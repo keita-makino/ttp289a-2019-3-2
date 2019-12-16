@@ -5,7 +5,7 @@ In this individual part, we will develop and argue several approaches in segment
 We first present the "best" models we have determined in the previous homework and then will try to improve the models by segmentation method. The models below are the best models (FSE: female, TMA: male) in homework 1.
 
 **Table 1.1. FSE Model (N=166)**  
-_\*: \* and \*\* respectively represents that the variable is significant with 90%/95% confidential level, assuming the t-Statistics will follow a normal distribution. We approximate a t-distribution to normal distribution as the sample size is larger than 30 in all the cases. Will apply in the rest of the document._
+_\*: \* and \*\* respectively represents that the variable is significant with 90%/95% confidential level, assuming the t-Statistics will follow a normal distribution. We approximate a t-distribution to normal distribution as the sample size is larger than 30 in all the cases. Both will apply in the rest of the document._
 
 | Variable                          | Estimate                    | Std. Error             | t-Sta.                      |
 | --------------------------------- | --------------------------- | ---------------------- | --------------------------- |
@@ -18,6 +18,7 @@ _\*: \* and \*\* respectively represents that the variable is significant with 9
 | Job unsuitability                 | -2.327                      | 0.663                  | -3.513 \*\*                 |
 | Age (binary grouping)             | -1.846                      | 0.677                  | -2.727 \*\*                 |
 | $\mathcal{L}$: -44.644            | $\mathcal{L}(EL)$: -115.062 | $\rho^2_{(EL)}$: 0.612 | Adj. $\rho^2_{(EL)}$: 0.543 |
+|                                   | $\mathcal{L}(MS)$: -114.954 | $\rho^2_{(MS)}$: 0.612 | Adj. $\rho^2_{(MS)}$: 0.551 |
 
 **Table 1.2. TMA Model (N=167)**
 
@@ -29,10 +30,11 @@ _\*: \* and \*\* respectively represents that the variable is significant with 9
 | Lack of manager support        | -2.031                      | 0.502                  | -4.046 \*\*                 |
 | Office Discipline              | -1.173                      | 0.281                  | -4.178 \*\*                 |
 | $\mathcal{L}$: -77.035         | $\mathcal{L}(EL)$: -115.756 | $\rho^2_{(EL)}$: 0.335 | Adj. $\rho^2_{(EL)}$: 0.291 |
+|                                | $\mathcal{L}(MS)$: -112.061 | $\rho^2_{(MS)}$: 0.313 | Adj. $\rho^2_{(MS)}$: 0.277 |
 
-We have removed a participant from the model creation if they have more than an invalid value in the variables (e.g., negative commute time) shown in each model. Note that, in this part we used `apollo` package in R whereas in the previous document we coded the logit model by ourselves. Therefore, some of the estimates have varied from what appeared in the homework 1 document. Typically, the variable "jobhome" (some job can be done from home) no longer be significant in the model in both cases. It is an odd behavior that the variable have an extremely high standard error as well as the standard error of the constant, but now we should remove the variable from the base models as it seems causing a singularity (perfect estimation) problem. Also, presence of young children at home in female model and two-way commute time in male model were not identified as a significant variable so that we will remove these two variables as well. Consequently, the base models (BF: female, BM: male) would have the following structure.
+We have removed a participant from the model creation if they have more than an invalid value in the variables (e.g., negative commute time) shown in each model. Note that, in this part we used `apollo` package in R whereas in the previous document we coded the logit model by ourselves. Therefore, some of the estimates have varied from what appeared in the homework 1 document. Typically, the variable "jobhome" (some job can be done from home) no longer be significant in the model in both cases. It is an odd behavior that the variable have an extremely high standard error as well as the standard error of the constant, but now we should remove the variable from the base models as it seems causing a singularity (perfect estimation) problem. Also, presence of young children at home in female model and two-way commute time in male model were not identified as a significant variable so that we will remove these two variables as well. Consequently, the base models (FB: female, MB: male) would have the following structure.
 
-**Table 2.1. BF Model (N=166)**
+**Table 2.1. FB Model (N=166)**
 
 | Variable                | Estimate                    | Std. Error             | t-Sta.                      |
 | ----------------------- | --------------------------- | ---------------------- | --------------------------- |
@@ -43,8 +45,9 @@ We have removed a participant from the model creation if they have more than an 
 | Job unsuitability       | -2.574                      | 0.618                  | -4.164 \*\*                 |
 | Age (binary grouping)   | -1.512                      | 0.567                  | -2.668 \*\*                 |
 | $\mathcal{L}$: -47.053  | $\mathcal{L}(EL)$: -115.062 | $\rho^2_{(EL)}$: 0.591 | Adj. $\rho^2_{(EL)}$: 0.539 |
+|                         | $\mathcal{L}(MS)$: -114.954 | $\rho^2_{(MS)}$: 0.591 | Adj. $\rho^2_{(MS)}$: 0.547 |
 
-**Table 2.2. BM Model (N=169)**
+**Table 2.2. MB Model (N=169)**
 
 | Variable                | Estimate                    | Std. Error             | t-Sta.                      |
 | ----------------------- | --------------------------- | ---------------------- | --------------------------- |
@@ -52,5 +55,6 @@ We have removed a participant from the model creation if they have more than an 
 | Lack of manager support | -2.512                      | 0.490                  | -5.128 \*\*                 |
 | Office Discipline       | -0.936                      | 0.234                  | -4.006 \*\*                 |
 | $\mathcal{L}$: -87.358  | $\mathcal{L}(EL)$: -117.142 | $\rho^2_{(EL)}$: 0.254 | Adj. $\rho^2_{(EL)}$: 0.229 |
+|                         | $\mathcal{L}(MS)$: -113.059 | $\rho^2_{(MS)}$: 0.227 | Adj. $\rho^2_{(MS)}$: 0.210 |
 
-We will discuss how to apply these models to the segmented dataset in the next section.
+By removing the insignificant variables, we observed a slight reduction in the performance criteria of female model, and a large reduction in that of male model. However, we can assess that this would be more appropriate than leaving an invalid variable in the models. We will discuss how to apply these models to the segmented dataset in the next section.

@@ -1,12 +1,5 @@
-femalem = function(database) {
-  apollo_beta = c(
-    asc = 0,
-    b_commtime = 0,
-    b_efact9 = 0,
-    b_manconst = 0,
-    b_jobconst = 0,
-    b_age = 0
-  )
+markets = function(database) {
+  apollo_beta = c(asc_f = 0, asc_m = 0)
   
   apollo_fixed = c()
   
@@ -18,7 +11,7 @@ femalem = function(database) {
   
   model = apollo_estimate(apollo_beta,
                           apollo_fixed,
-                          prob_femalem,
+                          prob_markets,
                           apollo_inputs)
   source("./output.R")
   output(model)
@@ -27,9 +20,9 @@ femalem = function(database) {
 }
 
 
-prob_femalem = function(apollo_beta,
-                        apollo_inputs,
-                        functionality = "estimate") {
+prob_markets = function(apollo_beta,
+                      apollo_inputs,
+                      functionality = "estimate") {
   apollo_attach(apollo_beta,
                 apollo_inputs)
   on.exit(apollo_detach(apollo_beta, apollo_inputs))
@@ -37,13 +30,8 @@ prob_femalem = function(apollo_beta,
   P = list()
   V = list()
   
-  V[["tele"]] = 
-    asc+
-    b_commtime * commtime +
-    b_efact9 * efact9 +
-    b_manconst * manconst +
-    b_jobconst * jobconst +
-    b_age * age
+  V[["tele"]] = asc_f * gender_f +
+    asc_m * gender_m
   V[["nontele"]] = 0
   
   mnl_settings = list(
